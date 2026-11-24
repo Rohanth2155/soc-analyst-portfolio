@@ -24,17 +24,13 @@
 
 ## The setup
 
+The Digital Assistant explains the rules: evidence has been pulled from the affected system and arrives by email, every file needs a different device, and there are five clues to find. A short tutorial walks you through the 3D office (walk to the cocoa station, make cocoa, take the mug to your table, free your mouse, open your phone). The clue counter starts at **0/5**.
+
 ![Briefing from the Digital Assistant](images/02-briefing.png)
-
-The Digital Assistant explains the rules: evidence has been pulled from the affected system and arrives by email, every file needs a different device, and there are five clues to find.
-
-The tutorial walks you through the 3D office (walk to the cocoa station, make cocoa, take the mug to your table, free your mouse, open your phone). The clue counter starts at **0/5**.
+*The Digital Assistant explains the rules.*
 
 ![Tutorial](images/03-tutorial.png)
-
-The office also has a smart speaker (the snowman), which matters at the end of the lab.
-
-![Smart speaker in the office](images/04-smart-speaker.png)
+*Tutorial in the office. Clue counter: 0/5.*
 
 ## Summary
 
@@ -45,23 +41,22 @@ The office also has a smart speaker (the snowman), which matters at the end of t
 | 3. Recover browser profile | Recover the hacker's alias from a damaged computer | Computer can't be moved, so a portable battery-powered device | Alias `GBies` |
 | 4. Restore evidence image | Rebuild a scrambled image, find where it was taken | Heavy processing without overheating | Image rebuilt (`IMG_7783.jpg`) |
 | 5. Scan QR code | Read a QR code for the hacker's machine serial number | A device with a camera (phone) | Turned out to be the hacker's email |
-| Containment | Find three IoT devices and disconnect them | Identify devices that connect to Wi-Fi to do one job | Speaker, climate panel, printer |
+| Containment | Find three IoT devices and disconnect them | Devices that connect to Wi-Fi to do one job | Smart speaker (snowman), climate panel, printer |
 
 ## Task 1: Repair 4K footage
 
-![Task 1 email](images/05-task1-email.png)
-
 **Brief:** repair the attached 4K surveillance video and search the footage for the exact time of the breach. The file is extremely large, so it needs a powerful computer that can process it quickly without slowing down.
 
-**Decision:** I sent the file to the **Workstation** (the screenshot shows "Sent to Workstation").
+**Decision:** I sent the file to the **Workstation** (the screen shows "Sent to Workstation").
 
 **Why:** repairing and scrubbing a large 4K video is heavy on CPU, GPU and memory. A phone or a small laptop would stall. Matching the job's compute needs to the device is the core idea of the whole lab.
 
 **Takeaway:** the footage gives a time anchor that other evidence (logs, files) can be correlated against.
 
-## Task 2: Search the network log
+![Task 1 email](images/05-task1-email.png)
+*Task 1 email, with the file sent to the Workstation.*
 
-![Task 2 email](images/06-task2-email.png)
+## Task 2: Search the network log
 
 **Brief:** search the office network's visitor record and find the IP the hacker connected from. The record is kept on the computer that manages the office network and has to stay on day and night.
 
@@ -71,8 +66,6 @@ The office also has a smart speaker (the snowman), which matters at the end of t
 ```bash
 grep "05:43" /var/log/network.log
 ```
-
-![Task 2 log search](images/07-task2-log-search.png)
 
 **Log excerpt (from the screenshot):**
 ```
@@ -88,23 +81,19 @@ Mar 02 05:52:33 office-server network-logd: visitor disconnect 10.0.0.44
 
 **Analyst note:** the time filter in the supplied command was `05:43`, but the public IP appears at `05:47:09` in the excerpt. In a real investigation I'd widen the window or search by IP (`grep "197.45.82.16" /var/log/network.log`), because a narrow time filter can miss the event you want.
 
-## Task 3: Recover browser profile
+![Task 2 email](images/06-task2-email.png)
+*Task 2 email.*
 
-![Task 3 email](images/08-task3-email.png)
+![Hacker IP found in the network log](images/07-task2-log-search.png)
+*Log search on the office server. Result: Hacker IP 197.45.82.16.*
+
+## Task 3: Recover browser profile
 
 **Brief:** a damaged computer from the breach is in the meeting room and cannot be moved. Bring a portable computer that runs on its own battery, connect it to the damaged case and search the evidence files for the hacker's alias.
 
 **Decision:** the **portable, battery-powered computer**, because the evidence stays where it is and the analysis device goes to it.
 
-**Recovery:** the SSD Recovery tool reports a damaged 512 GB SSD, then "Recovery complete".
-
-![SSD recovery](images/09-task3-ssd-recovery.png)
-
-The recovered folder holds one file, `evidence_alias.txt`.
-
-![Recovered files](images/10-task3-recovered-files.png)
-
-![evidence_alias.txt](images/11-task3-evidence-alias.png)
+**Recovery:** the SSD Recovery tool reports a damaged 512 GB SSD, then "Recovery complete". The recovered folder holds one file, `evidence_alias.txt`.
 
 | Field | Value |
 |---|---|
@@ -118,23 +107,35 @@ The recovered folder holds one file, `evidence_alias.txt`.
 
 *Real-world note:* on a real case I would image the drive through a write blocker and analyze the copy, not the original.
 
-## Task 4: Restore evidence image
+![Task 3 email](images/08-task3-email.png)
+*Task 3 email.*
 
-![Task 4 email](images/12-task4-email.png)
+![SSD recovery](images/09-task3-ssd-recovery.png)
+*SSD Recovery: damaged 512 GB SSD, recovery complete.*
+
+![Recovered files](images/10-task3-recovered-files.png)
+*Recovered folder with `evidence_alias.txt`.*
+
+![evidence_alias.txt showing the hacker alias](images/11-task3-evidence-alias.png)
+*Evidence file. Result: Hacker Alias GBies.*
+
+## Task 4: Restore evidence image
 
 **Brief:** the attached file contains a scrambled image. Rebuild it on a device that can handle heavy processing without overheating, then inspect the image to find where it was taken. The clue counter shows **3/5** at this point.
 
 **Process:** the Image Rebuilder shows the file as `IMG_7783.jpg`, a 4032 x 3024 JPG recovered from a mobile device. It runs four checks in order: file signature (valid), file structure (repairing), data blocks (pending) and image recovery (pending).
 
-![Image Rebuilder](images/13-task4-image-rebuilder.png)
-
 **Takeaway:** a valid file signature with a damaged structure is a typical corruption pattern, so the file type is recognized but the data blocks need repairing. Rebuilding a high-resolution image takes sustained processing, which is why the brief stresses overheating.
 
 *Real-world note:* after restoring an image I would also check its metadata (for example `exiftool IMG_7783.jpg`) for GPS coordinates, camera and timestamps, alongside visual landmarks.
 
-## Task 5: Scan QR code
+![Task 4 email](images/12-task4-email.png)
+*Task 4 email. Clues found: 3/5.*
 
-![Task 5 email](images/14-task5-qr-email.png)
+![Image Rebuilder](images/13-task4-image-rebuilder.png)
+*Image Rebuilder repairing `IMG_7783.jpg`.*
+
+## Task 5: Scan QR code
 
 **Brief:** a sticker with a QR code was recovered from the breach scene. Scan it with a device that has a camera, then open the information inside to find the hacker's machine serial number.
 
@@ -149,31 +150,41 @@ The recovered folder holds one file, `evidence_alias.txt`.
 | Tasks 1 to 4 | `digital.assistant@tbfc[.]com` |
 | Task 5 | `d1g1tal.assistant@tbfc[.]com` |
 
-The domain is the same, but the local part swaps the letters `i` for the digit `1`, and the display name still reads "Digital Assistant". This is a lookalike sender combined with a **QR code**, a technique often called quishing (QR-code phishing). The closest MITRE ATT&CK match is **T1566 (Phishing)**.
+The domain is the same, but the local part swaps the letter `i` for the digit `1`, and the display name still reads "Digital Assistant". This is a lookalike sender combined with a **QR code**, a technique often called quishing (QR-code phishing). The closest MITRE ATT&CK match is **T1566 (Phishing)**.
 
 **Takeaways:**
 - Check the real address, not the display name.
 - A QR code hides its destination, so treat unexpected codes like unexpected links.
 - Trust built over several genuine messages makes the spoofed one more convincing.
 
+![Task 5 email with the spoofed sender](images/14-task5-qr-email.png)
+*Task 5 email. The sender reads `d1g1tal.assistant@tbfc.com`.*
+
 ## Containment: disconnect the IoT devices
 
-![IoT alert](images/15-iot-alert.png)
-
-**Brief:** find the three IoT devices in the office and disconnect them quickly. IoT devices do one specific job and connect to Wi-Fi, and they should not be confused with embedded devices that don't need the office network.
+**Brief:** the assistant warns that the hacker controls most devices and can reach anything connected to the network. Find the three IoT devices in the office and disconnect them quickly. IoT devices do one specific job and connect to Wi-Fi, and they should not be confused with embedded devices that don't need the office network.
 
 **Devices disconnected:**
-1. **Smart speaker** (the snowman). The assistant confirms it is IoT because it is always connected to the internet, which is how it answers questions.
-2. **Smart climate / thermostat panel** (temperature, fan, heat, cooling controls) with a DISCONNECT button.
+1. **Smart speaker (the snowman).** The assistant confirms it is IoT because it is always connected to the internet, which is how it answers questions.
+2. **Smart climate / thermostat panel** (temperature, fan, heat and cooling controls) with a DISCONNECT button.
 3. **Network printer** (Print, Copy, Scan, Scan to, Connect to, Settings) with a DISCONNECT button.
 
-![Climate panel](images/16-iot-climate-panel.png)
+**Why IoT first:** these devices are always on the network, often lack endpoint protection and are rarely patched, so an attacker who controls them keeps a foothold. Isolating them fast is standard containment.
 
-![Printer](images/17-iot-printer.png)
+![Assistant: find the three IoT devices](images/15-iot-alert.png)
+*The assistant asks for the three IoT devices to be disconnected.*
+
+![The snowman smart speaker](images/04-smart-speaker.png)
+*IoT device 1: the snowman smart speaker, always connected to the internet.*
+
+![Climate panel with Disconnect](images/16-iot-climate-panel.png)
+*IoT device 2: the climate control panel.*
+
+![Printer with Disconnect](images/17-iot-printer.png)
+*IoT device 3: the network printer. The assistant confirms the smart speaker as IoT.*
 
 ![Lab complete](images/18-complete.png)
-
-**Why IoT first:** these devices are always on the network, often lack endpoint protection and are rarely patched, so an attacker who controls them keeps a foothold. Isolating them fast is standard containment.
+*Lab complete: every job matched to the right computer, IoT devices off the network.*
 
 ## Evidence summary (defanged)
 
@@ -185,7 +196,7 @@ The domain is the same, but the local part swaps the letters `i` for the digit `
 | Evidence file | `evidence_alias.txt` | Task 3 |
 | Restored image | `IMG_7783.jpg` (4032 x 3024) | Task 4 |
 | Spoofed sender | `d1g1tal.assistant@tbfc[.]com` | Task 5 |
-| Disconnected devices | Smart speaker, climate panel, printer | Containment |
+| Disconnected IoT devices | Smart speaker (snowman), climate panel, printer | Containment |
 
 ## Timeline (from the log excerpt, 2 March)
 
