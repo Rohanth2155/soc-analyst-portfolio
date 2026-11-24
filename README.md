@@ -11,6 +11,7 @@ Hands-on write-ups from my journey toward an entry-level SOC analyst role. Each 
 | [PsExec Hunt](labs/psexec-hunt) | Network forensics | Wireshark, SMB and NTLM analysis, lateral movement detection |
 | [Phishing Sample 1](labs/phishing-sample-1) | Email analysis | Header analysis, SPF/DKIM/DMARC, origin IP investigation, link analysis |
 | [Phishing Sample 2](labs/phishing-sample-2) | Email analysis | Reply-based phishing, spoofed brand, mailto lures, filter-evasion tricks |
+| [Snow Trail (TryHackMe AoC 2026)](labs/thm-aoc-2026-snow-trail) | DFIR / incident response | Log triage, data recovery, evidence handling, quishing recognition, IoT containment |
 
 ## Cheat sheets
 
