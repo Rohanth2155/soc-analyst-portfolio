@@ -125,6 +125,40 @@ index=* "137.184.34.4" | stats count by src_ip, dest_ip, host
 index=* subject="*LIVELO*" | stats count by sender, recipient
 ```
 
+## Commands used
+
+```bash
+# Header fields
+grep -iE "^(From|Return-Path|Reply-To|Message-ID|Subject|Date|X-Mailer):" sample-1.eml
+grep -i "^Received:" sample-1.eml                      # hops, read bottom to top
+grep -iE "Authentication-Results|Received-SPF" sample-1.eml
+
+# Attachments
+grep -iE "content-type|filename" sample-1.eml
+
+# Origin IP
+whois 137.184.34.4 | grep -iE "orgname|netname|country|descr|abuse"
+dig -x 137.184.34.4 +short                             # PTR (reverse DNS)
+
+# Link extraction (anchor text -> href, no clicking)
+python3 - <<'PY'
+import email, re
+from email import policy
+with open('sample-1.eml', 'rb') as f:
+    m = email.message_from_binary_file(f, policy=policy.default)
+body = m.get_body(preferencelist=('html', 'plain'))
+t = body.get_content() if body else ''
+for href, text in re.findall(r'<a[^>]+href=["\']([^"\']+)["\'][^>]*>(.*?)</a>', t, re.I | re.S):
+    print(re.sub(r'<[^>]+>', '', text).strip()[:60], '->', href)
+PY
+
+# Domain registration check
+whois blog1seguimentmydomaine2bra.me | head -40        # "Domain not found" = not registered
+
+# Defang before sharing
+echo "http://evil.example.com" | sed 's/\./[.]/g; s/http/hxxp/g'
+```
+
 ## Method (reusable checklist)
 
 ```
